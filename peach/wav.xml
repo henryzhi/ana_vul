@@ -1,0 +1,70 @@
+<!-- Defines the format of a WAV file -->
+<DataModel name="Wav">
+
+    <String value="RIFF" token="true" />
+    <Number size="32" />
+    <String value="WAVE" token="true"/>
+
+    <Choice maxOccurs="30000">
+        <Block ref="ChunkFmt"/>
+        <Block ref="ChunkData"/>
+        <Block ref="ChunkFact"/>
+        <Block ref="ChunkSint"/>
+        <Block ref="ChunkWavl"/>
+        <Block ref="ChunkCue"/>
+        <Block ref="ChunkPlst"/>
+        <Block ref="ChunkLtxt"/>
+        <Block ref="ChunkSmpl"/>
+        <Block ref="ChunkInst"/>
+        <Block ref="Chunk"/>
+    </Choice>
+</DataModel>
+
+<StateModel name="TheState" initialState="Initial">
+    <State name="Initial">
+
+        <!-- Write out our wave file -->
+        <Action type="output">
+            <DataModel ref="Wav"/>
+            <!-- This is our sample file to read in -->
+            <Data fileName="sample.wav"/>
+        </Action>
+
+        <Action type="close"/>
+
+        <Action type="call" method="StartMPlayer" publisher="Peach.Agent" />
+    </State>
+</StateModel>
+
+<Publisher class="File">
+    <Param name="FileName" value="fuzzed.wav"/>
+</Publisher>
+
+<Agent name="WinAgent">
+   <Monitor class="WindowsDebugger">
+
+        <Param name="CommandLine" value="c:\\mplayer\\mplayer.exe fuzzed.wav" />
+        <Param name="StartOnCall" value="StartMPlayer" />
+        <Param name="CpuKill" value="true"/>
+
+    </Monitor>
+
+    <!-- Enable heap debugging on our process as well. -->
+    <Monitor class="PageHeap">
+        <Param name="Executable" value="c:\\mplayer\\mplayer.exe"/>
+    </Monitor>
+
+</Agent>
+
+<Test name="Default">
+    <Agent ref="WinAgent" platform="windows"/>
+    <StateModel ref="TheState"/>
+
+    <Publisher class="File">
+        <Param name="FileName" value="fuzzed.wav"/>
+    </Publisher>
+
+    <Logger class="Filesystem">
+        <Param name="Path" value="logs" />
+    </Logger>
+</Test>

@@ -1,0 +1,4 @@
+0x00401121 call NtUserLoadKeyboardLayoutEx
+0x0040112e ActivateKeyboardLayout
+0xBF84734A add eax, 0FFFFFF7Ch
+0x77d212a0 NtUserLoadKeyboardLayoutEx
